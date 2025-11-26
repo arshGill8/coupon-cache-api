@@ -13,7 +13,6 @@ class CouponCache {
   get(code) {
     const entry = this.store.get(code);
     if (!entry) return null;
-
     if (Date.now() > entry.expiry) {
       this.store.delete(code);
       return null;

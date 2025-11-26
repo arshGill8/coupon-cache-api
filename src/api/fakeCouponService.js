@@ -5,6 +5,6 @@ const fakeDatabase = {
 };
 
 export async function fetchCouponFromDB(code) {
-  await new Promise((res) => setTimeout(res, 15000));
+  await new Promise((res) => setTimeout(res, 3000));
   return fakeDatabase[code] || null;
 }

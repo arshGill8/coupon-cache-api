@@ -1,16 +1,20 @@
 import express from "express";
-import CouponCache from "./cache/CouponCache";
-import { fetchCouponFromDB } from "./api/fakeCouponService";
+import CouponCache from "./cache/CouponCache.js";
+import { fetchCouponFromDB } from "./api/fakeCouponService.js";
+//benefit of cache: allows for faster fetching vs DB
 
+//setup express server
 const app = express();
 app.use(express.json());
 
-const cache = new CouponCache(15000); // 15-sec TTL
+//make new cache class instance with 15 sec TTL
+const cache = new CouponCache(15000);
 
+// setup get end point at coupon/:code,
 app.get("/coupon/:code", async (req, res) => {
   const { code } = req.params;
 
-  // 1. Check cache
+  // 1. check cache, return if found
   const cached = cache.get(code);
   if (cached) {
     return res.json({
@@ -19,19 +23,19 @@ app.get("/coupon/:code", async (req, res) => {
     });
   }
 
-  // 2. fetch from fake DB
+  // 2. fetch coupon from fake db
   const coupon = await fetchCouponFromDB(code);
   if (!coupon) {
-    return res.status(404).json({ message: "Not found" });
+    return res.status(404).json({ message: "Not Found" });
   }
 
-  // 3. Add to cache
+  // 3. if coupon found in fake db add to cache
   cache.add(coupon);
 
-  // 4. Return from database
-  res.json({
+  // 4. return coupon from db
+  return res.json({
     source: "database",
-    coupon,
+    coupon: coupon,
   });
 });
 
